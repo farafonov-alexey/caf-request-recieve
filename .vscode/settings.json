@@ -1,0 +1,22 @@
+{
+    "cmake.configureOnOpen": true,
+    "cmake.buildDirectory": "${workspaceFolder}/build-${buildType}-${buildKit}",
+    "cmake.configureSettings": {
+        "CMAKE_BUILD_TYPE": "${buildType}"
+    },
+    "vim.handleKeys": {
+        "<C-a>": false,
+        "<C-c>": false,
+        "<C-v>": false,
+        "<C-f>": false
+    },
+    "editor.formatOnSave": true,
+    "files.associations": {
+        "*.in": "ignore",
+        "chrono": "cpp",
+        "condition_variable": "cpp",
+        "future": "cpp",
+        "mutex": "cpp",
+        "thread": "cpp"
+    },
+}

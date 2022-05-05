@@ -1,0 +1,11 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "conan install win_msvc_x86_release",
+            "type": "shell",
+            "command": "conan install -pr:b .profiles/win_msvc_2019_x86_release_build -pr:h .profiles/win_msvc_2019_x86_release_host -if \"${command:cmake.buildDirectory}\" \"${workspaceFolder}\" --build missing",
+            "problemMatcher": []
+        }
+    ]
+}

@@ -1,0 +1,45 @@
+cmake_minimum_required(VERSION 3.2)
+project(caf_request_recieve CXX)
+
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+# -- FC CXX standard
+set(CMAKE_CXX_STANDARD 17)
+message("CMAKE_BUILD_TYPE=" ${CMAKE_BUILD_TYPE})
+if (${CMAKE_BUILD_TYPE} STREQUAL Debug)
+    if(MSVC)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+    endif()
+elseif (${CMAKE_BUILD_TYPE} STREQUAL Release)
+    if(MSVC)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /O2")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -O3 -Wall -Wextra -Waddress -Wpedantic")
+    endif()
+endif ()
+
+cmake_policy(SET CMP0020 NEW)
+# -- install from conan
+if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
+    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    conan_basic_setup()
+else ()
+    message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
+endif ()
+
+# -- output paths
+set(LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE})
+message("LIBRARY_OUTPUT_DIRECTORY =" ${LIBRARY_OUTPUT_DIRECTORY})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
+MESSAGE("OUTPUT: " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+if (WIN32)
+    if(MSVC)
+        list(APPEND CAF_EXTRA_LDFLAGS ws2_32 iphlpapi psapi)
+    endif()
+endif (WIN32)
+
+add_subdirectory(src)
