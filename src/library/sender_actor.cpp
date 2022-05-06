@@ -12,7 +12,7 @@ caf::behavior sender_actor::make_behavior() {
   auto await_cmd = message_handler{
       [=](cmd_atom, const std::string &cmd) -> result<std::string> {
         duration::instance().end();
-        cout << "cmd sender: " << cmd << endl;
+        // cout << "cmd sender: " << cmd << endl;
         return {"test resp"};
       }};
 
