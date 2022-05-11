@@ -6,56 +6,41 @@
 #include "caf/caf_main.hpp"
 #include "caf/event_based_actor.hpp"
 #include "caf/scoped_actor.hpp"
-#include "duration.h"
+#include "caf/timestamp.hpp"
 
 using namespace caf;
 
-behavior mirror(event_based_actor *self) {
-  // return the (initial) actor behavior
-  return {
-      // a handler for messages containing a single string
-      // that replies with a string
-      [=](const std::string &what) -> std::string {
-        duration::instance().end();
-        // prints "Hello World!" via aout (thread-safe cout wrapper)
-        aout(self) << what << std::endl;
-        // reply "!dlroW olleH"
-        return std::string{what.rbegin(), what.rend()};
-      },
-  };
+using namespace std::literals;
+
+behavior clock_actor() {
+  return {[](get_atom) { return make_timestamp(); }};
 }
 
-void hello_world(event_based_actor *self, const actor &buddy) {
-  // send "Hello World!" to our buddy ...
-  self->request(buddy, std::chrono::seconds(10), "Hello World!")
-      .then(
-          // ... wait up to 10s for a response ...
-          [=](const std::string &what) {
-            // ... and print it
-            aout(self) << what << std::endl;
-          });
-}
-
-void caf_main(actor_system &sys) {
-  // create a new actor that calls 'mirror()'
-  auto mirror_actor = sys.spawn(mirror);
+void request(actor_system &sys, caf::actor &clk) {
   scoped_actor self{sys};
-  for (int i = 0; i < 50; i++) {
-    duration::instance().begin();
-    self->request(mirror_actor, std::chrono::seconds(10), "command_1")
-        .receive(
-            [&](const std::string &data) {
-              aout(self) << "data: " << data << std::endl;
-            },
-            [&](caf::error &err) {
-              aout(self) << "err: " << to_string(err) << std::endl;
-            });
-  }
-
-  // create another actor that calls 'hello_world(mirror_actor)';
-  //   sys.spawn(hello_world, mirror_actor);
-  // the system will wait until both actors are done before exiting the program
+  auto t0 = make_timestamp();
+  self->request(clk, 5s, get_atom_v)
+      .receive(
+          [&](timestamp t1) {
+            auto t2 = make_timestamp();
+            std::cout << "request-response:\n"
+                      << "t0: " << caf::deep_to_string(t0) << '\n'
+                      << "t1: " << caf::deep_to_string(t1) << '\n'
+                      << "t2: " << caf::deep_to_string(t2) << '\n'
+                      << "delta (full): " << caf::deep_to_string(t2 - t0)
+                      << '\n'
+                      << "delta (self -> clock): "
+                      << caf::deep_to_string(t1 - t0) << '\n'
+                      << "delta (clock -> self): "
+                      << caf::deep_to_string(t2 - t1) << '\n';
+          },
+          [](const error &) {});
+}
+void caf_main(actor_system &sys) {
+  // request-response
+  auto clk = sys.spawn(clock_actor);
+  request(sys, clk);
+  request(sys, clk);
 }
 
-// creates a main function for us that calls our caf_main
 CAF_MAIN()
