@@ -39,8 +39,9 @@ void request(actor_system &sys, caf::actor &clk) {
 void caf_main(actor_system &sys) {
   // request-response
   auto clk = sys.spawn(clock_actor);
-  request(sys, clk);
-  request(sys, clk);
+  for (int i = 0; i < 5; i++) {
+    request(sys, clk);
+  }
 }
 
 CAF_MAIN()

@@ -25,12 +25,6 @@ public:
     reciever_ = empty;
   }
   int library_manager::do_stuff() override {
-    cout << "caf"
-         << caf::get_or(system_->config(),
-                        "caf.work-stealing.relaxed-sleep-duration",
-                        caf::defaults::work_stealing::relaxed_sleep_duration)
-                .count()
-         << endl;
     caf::scoped_actor self{system_->system()};
     duration::instance().begin();
     self->request(sender_, chrono::seconds(10), cmd_atom_v, "command_1")
