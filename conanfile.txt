@@ -1,13 +1,16 @@
 [requires]
 caf/0.18.6
-qt/5.15.3
+#qt/5.15.3
 fruit/3.4.0
+boost/1.72.0
 
 [options]
 caf:with_openssl=False
 fruit:use_boost=False
 qt:shared=True
+boost:header_only=False
+boost:without_stacktrace=True
 
 [generators]
-#cmake
+cmake
 cmake_find_package

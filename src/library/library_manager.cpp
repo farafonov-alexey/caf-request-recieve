@@ -12,19 +12,19 @@ using namespace std;
 class library_manager : public library_manager_base {
 public:
   INJECT(library_manager(caf_system_base *system)) : system_(system){};
-  int library_manager::create() override {
+  int create() override {
     sender_ = system_->system().spawn<sender_actor>();
     reciever_ = system_->system().spawn<reciever_actor>();
     caf::scoped_actor self{system_->system()};
     self->send(sender_, init_atom_v, reciever_);
     return 0;
   }
-  void library_manager::destroy() override {
+  void destroy() override {
     caf::actor empty;
     sender_ = empty;
     reciever_ = empty;
   }
-  int library_manager::do_stuff() override {
+  int do_stuff() override {
     caf::scoped_actor self{system_->system()};
     duration::instance().begin();
     self->request(sender_, chrono::seconds(10), cmd_atom_v, "command_1")

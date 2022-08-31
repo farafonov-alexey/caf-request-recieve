@@ -1,4 +1,5 @@
 project(library CXX)
+find_package(Boost COMPONENTS fiber REQUIRED)
 set(SRCS
         library/caf_system.cpp
         library/caf_system_config.cpp
@@ -18,6 +19,7 @@ set(DEPS
         # Qt5Core
         caf_core
         fruit
+        Boost::fiber
         # caf_io
         ${CAF_EXTRA_LDFLAGS}
         )
